@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -24,41 +25,7 @@ public class Paint extends Canvas implements Runnable
 	private int[] pixels;
 	private int[] hudpix;
 	public static int width, height, scale;
-	public PaintColors color = PaintColors.BLUE;
-
-	private static enum PaintColors
-	{
-		RED(0, 255, 0, 0), GREEN(1, 0, 255, 0), BLUE(2, 0, 0, 255), BLACK(3, 0, 0, 0), WHITE(4, 255, 255, 255);
-
-		public int id, red, green, blue;
-
-		PaintColors(int id, int red, int green, int blue)
-		{
-			this.id = id;
-			this.red = red;
-			this.green = green;
-			this.blue = blue;
-		}
-
-		public PaintColors getColorById(int id) {
-			for (PaintColors c : values()) {
-				if(c.id == id) return c;
-			}
-			return null;
-		}
-
-		public int getHex() {
-			return 255 << 24 | red << 16 | green << 8 | blue;
-		}
-
-		public PaintColors next() {
-			return getColorById(id + 1) == null ? PaintColors.RED : getColorById(id + 1);
-		}
-
-		public PaintColors prev() {
-			return getColorById(id - 1) == null ? PaintColors.WHITE : getColorById(id - 1);
-		}
-	}
+	public Color color = Color.getColorByName("blue");
 
 	public void paint(Graphics g) {
 		updateHud();
@@ -84,6 +51,7 @@ public class Paint extends Canvas implements Runnable
 		for (int i = 0; i < pixels.length; i++) {
 			pixels[i] = 255 << 24 | 0;
 		}
+
 		hudpix = new int[Paint.width * 100];
 		for (int i = 0; i < hudpix.length; i++) {
 			hudpix[i] = color.getHex();
@@ -106,11 +74,15 @@ public class Paint extends Canvas implements Runnable
 						}
 					}
 				}
-//				if(e.getKeyChar() == 'h') {
-//					new Server();
-//				}
+				if(e.getKeyChar() == 'o') { // Open color view
+					java.awt.Color col = JColorChooser.showDialog(null, "Select a color", java.awt.Color.BLACK);
+					if(col != null) {
+						color = new Color(Color.getNumColors(), "Custom " + Color.getNumColors(), col.getRed(), col.getGreen(), col.getBlue());
+						Color.addColor(color);
+					}
+				}
 				if(e.getKeyChar() == '?') { // Show keys
-					JOptionPane.showMessageDialog(null, "a/d - Previous/next color\n? - Help\ne - export image\nc - clear", "Help", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(null, "a/d - Previous/next color\n? - Help\ne - export image\nc - clear\no - choose a custom color", "Help", JOptionPane.INFORMATION_MESSAGE);
 				}
 				if(e.getKeyChar() == 'e') { // Export image
 					JFileChooser jfc = new JFileChooser();
@@ -150,6 +122,8 @@ public class Paint extends Canvas implements Runnable
 			public void mouseDragged(MouseEvent e) {
 				int x = e.getX() / scale;
 				int y = e.getY() / scale;
+				if(x>=width/scale || x<0) return;
+				if(y>=height/scale || y<0) return;
 				try {
 					if(!e.isControlDown()) {
 						pixels[y * Paint.width + x] = color.getHex();
@@ -182,13 +156,11 @@ public class Paint extends Canvas implements Runnable
 			public void mouseClicked(MouseEvent e) {
 				int x = e.getX() / scale;
 				int y = e.getY() / scale;
-
 				if(!e.isControlDown()) {
 					pixels[y * Paint.width + x] = color.getHex();
 				} else {
 					pixels[y * Paint.width + x] = 255 << 24 | (255 - color.red) << 16 | (255 - color.green) << 8 | (255 - color.blue);
 				}
-
 			}
 		});
 
