@@ -27,12 +27,27 @@ public class Paint extends Canvas implements Runnable
 	private int[] pixels;
 	private int[] hudpix;
 	public static int width, height, scale;
-	public Color color = Color.getColorByName("blue");
+	
+	private int debugx = 10, debugy = 10, posx=0, posy=0;
+	private boolean debug = false;
+
+	public Color color = Color.getColorByName("red"), secondcolor = Color.getColorByName("white");
 
 	public void paint(Graphics g) {
 		updateHud();
 		g.drawImage(createImage(new MemoryImageSource(width, height, pixels, 0, width)), 0, 0, Main.WIDTH, Main.HEIGHT - 100, null);
 		g.drawImage(createImage(new MemoryImageSource(width, 100, hudpix, 0, width)), 0, Main.HEIGHT - 100, Main.WIDTH, Main.HEIGHT - 100, null);
+		if(debug) {
+			String debugstrn = "(" + posx + "," + posy + ")"; 
+			g.setColor(java.awt.Color.white);
+			g.drawString("PCol: " + color.name, 5, 10);
+			g.drawString("SCol: " + secondcolor.name, 5, 20);
+			g.drawString("Last pos: (" + debugx + "," + debugy + ")", 5, 30);
+			g.drawString(debugstrn, posx, posy);
+			g.drawLine(posx, 0, posx, Main.HEIGHT-100);
+			g.drawLine(0, posy, Main.WIDTH, posy);
+			
+		}
 	}
 
 	private void updateHud() {
@@ -40,7 +55,14 @@ public class Paint extends Canvas implements Runnable
 			if(i < width) {
 				hudpix[i] = 255 << 24 | 255 << 16 | 255 << 8 | 0;
 			} else {
-				hudpix[i] = color.getHex();
+				int temp = (i % width) + i / width;
+				int offset = 5;
+				if(temp >= width / 2 + offset && temp <= width / 2 + (offset + 1))
+					hudpix[i] = 255 << 24 | 0;
+				else if(temp > width / 2 + (offset + 1))
+					hudpix[i] = secondcolor.getHex();
+				else
+					hudpix[i] = color.getHex();
 			}
 		}
 	}
@@ -53,21 +75,31 @@ public class Paint extends Canvas implements Runnable
 		for (int i = 0; i < pixels.length; i++) {
 			pixels[i] = 255 << 24 | 0;
 		}
-
 		hudpix = new int[Paint.width * 100];
-		for (int i = 0; i < hudpix.length; i++) {
-			hudpix[i] = color.getHex();
-		}
 
 		addKeyListener(new KeyListener() {
 
 			@Override
 			public void keyTyped(KeyEvent e) {
+				if(e.getKeyChar() == 's') {
+					Color temp = secondcolor;
+					secondcolor = color;
+					color = temp;
+				}
 				if(e.getKeyChar() == 'a') { // Previous color
 					color = color.prev();
 				}
+				if(e.getKeyChar() == 'A') { // Previous second color
+					secondcolor = secondcolor.prev();
+				}
 				if(e.getKeyChar() == 'd') { // Next color
 					color = color.next();
+				}
+				if(e.getKeyChar() == 'D') { // Next second color
+					secondcolor = secondcolor.next();
+				}
+				if(e.getKeyChar() == 'G') {
+					debug = !debug;
 				}
 				if(e.getKeyChar() == 'c') { // Clear
 					if(!e.isShiftDown()) {
@@ -76,15 +108,21 @@ public class Paint extends Canvas implements Runnable
 						}
 					}
 				}
-				if(e.getKeyChar() == 'o') { // Open color view
+				if(e.getKeyChar() == 'o' || e.getKeyChar() == 'O') { // Open
+																		// color
+																		// view
 					java.awt.Color col = JColorChooser.showDialog(null, "Select a color", java.awt.Color.BLACK);
 					if(col != null) {
-						color = new Color(Color.counter, "Custom " + Color.getNumColors(), col.getRed(), col.getGreen(), col.getBlue());
-						Color.addColor(color);
+						String name = "Custom " + Color.counter;
+						Color.addColor(new Color(Color.counter, name, col.getRed(), col.getGreen(), col.getBlue()));
+						if(e.getKeyChar() == 'o')
+							color = Color.getColorByName(name);
+						else
+							secondcolor = Color.getColorByName(name);
 					}
 				}
 				if(e.getKeyChar() == '?') { // Show keys
-					JOptionPane.showMessageDialog(null, "a/d - Previous/next color\n? - Help\ne - export image\nc - clear\no - choose a custom color", "Help", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Note: Shift+Any listed key might behave on the second color.\na/d - Previous/next color\n? - Help\ne - export image\nc - clear\no - choose a custom color\ns - swap primary and secondary colors", "Help", JOptionPane.INFORMATION_MESSAGE);
 				}
 				if(e.getKeyChar() == 'e') { // Export image
 					JFileChooser jfc = new JFileChooser();
@@ -118,17 +156,27 @@ public class Paint extends Canvas implements Runnable
 
 			@Override
 			public void mouseMoved(MouseEvent e) {
+				posx = e.getX();
+				posy = e.getY();
 			}
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				int x = e.getX() / scale;
 				int y = e.getY() / scale;
-				if(x>=width/scale || x<0) return;
-				if(y>=height/scale || y<0) return;
+				
+				debugx = x * scale;
+				debugy = y * scale;
+				
+				posx = e.getX();
+				posy = e.getY();
+				
+				if(x >= width / scale || x < 0) return;
+				if(y >= height / scale || y < 0) return;
 				try {
+					Color touse = e.isShiftDown()? secondcolor : color;
 					if(!e.isControlDown()) {
-						pixels[y * Paint.width + x] = color.getHex();
+						pixels[y * Paint.width + x] = touse.getHex();
 					} else {
 						pixels[y * Paint.width + x] = 255 << 24 | (255 - color.red) << 16 | (255 - color.green) << 8 | (255 - color.blue);
 					}
@@ -158,6 +206,10 @@ public class Paint extends Canvas implements Runnable
 			public void mouseClicked(MouseEvent e) {
 				int x = e.getX() / scale;
 				int y = e.getY() / scale;
+				
+				debugx = x * scale;
+				debugy = y * scale;
+				
 				if(!e.isControlDown()) {
 					pixels[y * Paint.width + x] = color.getHex();
 				} else {

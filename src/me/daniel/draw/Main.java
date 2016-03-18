@@ -12,21 +12,24 @@ import me.daniel.draw.objects.Color;
 public class Main
 {
 	public static final int WIDTH = 800, HEIGHT = 600;
-	
+
 	public static void main(String[] args) {
 		Color.init();
 		new Main();
 	}
-	
-	public Main() {
+
+	public Main()
+	{
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {}
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+		}
 		JFrame frame = new JFrame("Multi-user Paint | ? for help");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		try {
 			frame.setIconImage(ImageIO.read(getClass().getResource("icon.png")));
-		} catch (IOException e) {}
+		} catch (IOException e) {
+		}
 		frame.setSize(WIDTH, HEIGHT);
 		frame.setResizable(false);
 		frame.setLocationRelativeTo(null);

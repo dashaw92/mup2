@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Color
 {
-	private static List<Color> colors = new ArrayList<>();
+	public static List<Color> colors = new ArrayList<>();
 	public static int counter;
 
 	public static void addColor(Color c) {
@@ -13,7 +13,7 @@ public class Color
 		counter++;
 	}
 	
-	public static int getNumColors() {
+	public int getNumColors() {
 		return colors.size()-1;
 	}
 	
@@ -27,7 +27,7 @@ public class Color
 
 	public int id, red, green, blue;
 	public String name;
-
+	
 	public Color(int id, String name, int red, int green, int blue)
 	{
 		this.id = id;
