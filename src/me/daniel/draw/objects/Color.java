@@ -1,4 +1,4 @@
-package me.daniel.draw;
+package me.daniel.draw.objects;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,9 +6,11 @@ import java.util.List;
 public class Color
 {
 	private static List<Color> colors = new ArrayList<>();
+	public static int counter;
 
 	public static void addColor(Color c) {
 		colors.add(c);
+		counter++;
 	}
 	
 	public static int getNumColors() {
@@ -16,11 +18,11 @@ public class Color
 	}
 	
 	public static void init() {
-		colors.add(new Color(0, "RED", 255, 0, 0));
-		colors.add(new Color(1, "GREEN", 0, 255, 0));
-		colors.add(new Color(2, "BLUE", 0, 0, 255));
-		colors.add(new Color(3, "BLACK", 0, 0, 0));
-		colors.add(new Color(4, "WHITE", 255, 255, 255));
+		addColor(new Color(0, "RED", 255, 0, 0));
+		addColor(new Color(1, "GREEN", 0, 255, 0));
+		addColor(new Color(2, "BLUE", 0, 0, 255));
+		addColor(new Color(3, "BLACK", 0, 0, 0));
+		addColor(new Color(4, "WHITE", 255, 255, 255));
 	}
 
 	public int id, red, green, blue;

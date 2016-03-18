@@ -19,6 +19,8 @@ import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import me.daniel.draw.objects.Color;
+
 @SuppressWarnings("serial")
 public class Paint extends Canvas implements Runnable
 {
@@ -77,7 +79,7 @@ public class Paint extends Canvas implements Runnable
 				if(e.getKeyChar() == 'o') { // Open color view
 					java.awt.Color col = JColorChooser.showDialog(null, "Select a color", java.awt.Color.BLACK);
 					if(col != null) {
-						color = new Color(Color.getNumColors(), "Custom " + Color.getNumColors(), col.getRed(), col.getGreen(), col.getBlue());
+						color = new Color(Color.counter, "Custom " + Color.getNumColors(), col.getRed(), col.getGreen(), col.getBlue());
 						Color.addColor(color);
 					}
 				}

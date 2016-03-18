@@ -7,6 +7,8 @@ import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import me.daniel.draw.objects.Color;
+
 public class Main
 {
 	public static final int WIDTH = 800, HEIGHT = 600;

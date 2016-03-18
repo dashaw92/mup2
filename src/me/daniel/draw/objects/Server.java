@@ -1,4 +1,4 @@
-package me.daniel.draw;
+package me.daniel.draw.objects;
 
 import java.net.DatagramSocket;
 
