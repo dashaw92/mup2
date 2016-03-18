@@ -101,11 +101,9 @@ public class Paint extends Canvas implements Runnable
 				if(e.getKeyChar() == 'G') {
 					debug = !debug;
 				}
-				if(e.getKeyChar() == 'c') { // Clear
-					if(!e.isShiftDown()) {
-						for (int i = 0; i < pixels.length; i++) {
-							pixels[i] = 255 << 24 | 0;
-						}
+				if(e.getKeyChar() == 'C') { // Clear
+					for (int i = 0; i < pixels.length; i++) {
+						pixels[i] = 255 << 24 | 0;
 					}
 				}
 				if(e.getKeyChar() == 'o' || e.getKeyChar() == 'O') { // Open
